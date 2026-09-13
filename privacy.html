@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>سياسة الخصوصية وشروط الاستخدام</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #000;
+      font-family: 'Tajawal', sans-serif;
+    }
+
+    #loader-overlay {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
+      will-change: opacity;
+    }
+
+    #loader-overlay.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .spinner {
+      width: 44px;
+      height: 44px;
+      border: 2.5px solid rgba(255, 255, 255, 0.15);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .viewport {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      perspective: 1100px;
+      perspective-origin: 50% 100%;
+      background-color: #000;
+    }
+
+    .world-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 180vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      padding: 6vh 20px 0;
+      transform-origin: 50% 100%;
+
+      background: linear-gradient(
+        180deg,
+        #4b92db 0%,
+        #8bc2f0 25%,
+        #d1e7f8 50%,
+        #1c2630 80%,
+        #000000 100%
+      );
+
+      transform: translateY(-45%) rotateX(-55deg) scale(1.15);
+      filter: brightness(0.4);
+      transition: transform 2.4s cubic-bezier(0.19, 1, 0.22, 1), filter 2.2s ease-out;
+      will-change: transform, filter;
+    }
+
+    .world-canvas.look-up {
+      transform: translateY(0%) rotateX(0deg) scale(1);
+      filter: brightness(1);
+    }
+
+    .privacy-card-container {
+      width: 100%;
+      max-width: 640px;
+      margin-top: 5vh;
+      margin-bottom: 70vh;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 1.8s cubic-bezier(0.19, 1, 0.22, 1) 0.4s, transform 1.8s cubic-bezier(0.19, 1, 0.22, 1) 0.4s;
+    }
+
+    .world-canvas.look-up .privacy-card-container {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .privacy-card {
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 20px;
+      padding: 26px 30px;
+      color: #ffffff;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+      max-height: 60vh;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+    }
+
+    .privacy-card::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .privacy-card::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 10px;
+    }
+
+    .privacy-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+      padding-bottom: 14px;
+      margin-bottom: 18px;
+    }
+
+    .privacy-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .back-link {
+      color: #a8d5ff;
+      text-decoration: none;
+      font-size: 0.88rem;
+      transition: color 0.2s;
+    }
+
+    .back-link:hover {
+      color: #ffffff;
+    }
+
+    .privacy-section {
+      margin-bottom: 18px;
+    }
+
+    .section-title {
+      font-size: 0.98rem;
+      font-weight: 700;
+      color: #d1e7f8;
+      margin-bottom: 6px;
+    }
+
+    .section-text {
+      font-size: 0.88rem;
+      line-height: 1.7;
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    .privacy-list {
+      list-style-type: disc;
+      margin-right: 20px;
+      margin-top: 6px;
+      font-size: 0.85rem;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.8);
+    }
+  </style>
+</head>
+<body>
+
+  <div id="loader-overlay">
+    <div class="spinner"></div>
+  </div>
+
+  <div class="viewport">
+    <main id="world" class="world-canvas">
+
+      <div class="privacy-card-container">
+        <div class="privacy-card">
+          
+          <div class="privacy-header">
+            <h2 class="privacy-title">سياسة الخصوصية والأمان</h2>
+            <a href="index.html" class="back-link">العودة للرئيسية ←</a>
+          </div>
+
+          <div class="privacy-section">
+            <h3 class="section-title">1. الغرض من الخدمة</h3>
+            <p class="section-text">
+              تم تطوير هذه المنصة لتسهيل وأتمتة إرسال طلبات التوظيف والسير الذاتية للشركات بكفاءة وأمان، مع اعتماد وتيرة إرسال بمحاكاة سلوك بشري طبيعي يحمي حسابات المستخدمين من الحظر والتقييد.
+            </p>
+          </div>
+
+          <div class="privacy-section">
+            <h3 class="section-title">2. الصلاحيات والربط الرسمي (OAuth)</h3>
+            <p class="section-text">
+              يتم الربط حصرياً عبر بروتوكولات المصادقة المعتمدة لدى Google و Microsoft. الصلاحية المطلوبة تقتصر بدقة على إرسال البريد فقط (Mail.Send / gmail.send).
+            </p>
+            <ul class="privacy-list">
+              <li>لا نطلع على رسائل بريدك الواردة أو الخاصة إطلاقاً.</li>
+              <li>لا يتم تخزين كلمات السر، بل يُدار الاتصال عبر مفاتيح برمجية مشفرة ومؤقتة تنتهي بانتهاء الجلسة.</li>
+            </ul>
+          </div>
+
+          <div class="privacy-section">
+            <h3 class="section-title">3. معالجة وتخزين البيانات</h3>
+            <p class="section-text">
+              تعتمد المنصة سياسة المعالجة اللحظية في الذاكرة (In-Memory Processing). يتم رفع السيرة الذاتية (CV) مؤقتاً لتضمينها في حملة الإرسال المحددة، ولا نقوم بتخزين ملفك أو بيع ومشاركة بياناتك مع أي طرف خارجي.
+            </p>
+          </div>
+
+          <div class="privacy-section">
+            <h3 class="section-title">4. مسؤولية الاستخدام</h3>
+            <p class="section-text">
+              الخدمة مخصصة حصراً للأغراض المهنية والتقديم على الوظائف. يتحمل المستخدم المسؤولية الكاملة عن محتوى الرسائل والمرفقات الصادرة من حسابه.
+            </p>
+          </div>
+
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        const loader = document.getElementById('loader-overlay');
+        const world = document.getElementById('world');
+
+        loader.classList.add('hidden');
+        world.classList.add('look-up');
+
+        setTimeout(() => {
+          loader.remove();
+        }, 800);
+      }, 900);
+    });
+  </script>
+
+</body>
+</html>

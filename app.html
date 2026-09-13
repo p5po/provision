@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>بوابة التقديم</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #000;
+      font-family: 'Tajawal', sans-serif;
+    }
+
+    /* 1. مؤشر اللودينق */
+    #loader-overlay {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
+      will-change: opacity;
+    }
+
+    #loader-overlay.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .spinner {
+      width: 44px;
+      height: 44px;
+      border: 2.5px solid rgba(255, 255, 255, 0.15);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* 2. مسرح الرؤية ثلاثي الأبعاد الأصلي */
+    .viewport {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      perspective: 1100px;
+      perspective-origin: 50% 100%;
+      background-color: #000;
+    }
+
+    .world-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 180vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      padding: 6vh 20px 0;
+      transform-origin: 50% 100%;
+
+      background: linear-gradient(
+        180deg,
+        #4b92db 0%,
+        #8bc2f0 25%,
+        #d1e7f8 50%,
+        #1c2630 80%,
+        #000000 100%
+      );
+
+      transform: translateY(-45%) rotateX(-55deg) scale(1.15);
+      filter: brightness(0.4);
+      transition: transform 2.4s cubic-bezier(0.19, 1, 0.22, 1), filter 2.2s ease-out;
+      will-change: transform, filter;
+    }
+
+    .world-canvas.look-up {
+      transform: translateY(0%) rotateX(0deg) scale(1);
+      filter: brightness(1);
+    }
+
+    /* المساحة المخصصة للفورم بنفس موضع أزرار الدخول */
+    .app-container {
+      width: 100%;
+      max-width: 400px;
+      margin-top: 4vh;
+      margin-bottom: 75vh;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 1.8s cubic-bezier(0.19, 1, 0.22, 1) 0.5s, transform 1.8s cubic-bezier(0.19, 1, 0.22, 1) 0.5s;
+    }
+
+    .world-canvas.look-up .app-container {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* شريط الحساب المتصل */
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .header-user {
+      font-size: 0.85rem;
+      color: #ffffff;
+      font-weight: 500;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+    }
+
+    .header-logout {
+      font-size: 0.78rem;
+      color: rgba(255, 255, 255, 0.75);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .header-logout:hover {
+      color: #ffffff;
+    }
+
+    /* النموذج والحقول */
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .field-box {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .field-box label {
+      font-size: 0.8rem;
+      color: #ffffff;
+      font-weight: 500;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    }
+
+    /* إزالة سواد الحقول وجعلها زجاج شفاف خفيف متناسق */
+    input[type="text"], textarea {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 12px;
+      padding: 10px 14px;
+      color: #ffffff;
+      font-family: 'Tajawal', sans-serif;
+      font-size: 0.88rem;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    input[type="text"]:focus, textarea:focus {
+      border-color: rgba(255, 255, 255, 0.6);
+      background: rgba(255, 255, 255, 0.18);
+    }
+
+    input::placeholder, textarea::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 0.82rem;
+    }
+
+    textarea {
+      min-height: 80px;
+      resize: none;
+      line-height: 1.5;
+    }
+
+    /* زر رفع السيرة الذاتية */
+    .file-uploader {
+      position: relative;
+      border: 1px dashed rgba(255, 255, 255, 0.35);
+      border-radius: 12px;
+      padding: 11px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+
+    .file-uploader:hover {
+      border-color: rgba(255, 255, 255, 0.6);
+    }
+
+    .file-text {
+      font-size: 0.82rem;
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    .file-tag {
+      font-size: 0.72rem;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 3px 8px;
+      border-radius: 6px;
+      color: #ffffff;
+    }
+
+    input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* أزرار الدفعة المدمجة بنفس روح الزجاج */
+    .batch-pills {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      padding: 3px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .batch-pills input {
+      display: none;
+    }
+
+    .batch-pill-btn {
+      text-align: center;
+      padding: 8px 0;
+      font-size: 0.76rem;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.75);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .batch-pills input:checked + .batch-pill-btn {
+      background: rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    /* زر الإرسال بنفس ستايل زر الـ OAuth بالضبط */
+    .btn-submit {
+      width: 100%;
+      margin-top: 4px;
+      padding: 12px 20px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      background: rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      color: #ffffff;
+      font-size: 0.95rem;
+      font-weight: 600;
+      font-family: 'Tajawal', sans-serif;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+    }
+
+    .btn-submit:hover {
+      background: rgba(255, 255, 255, 0.18);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: translateY(-2px);
+      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.35);
+    }
+
+    .btn-submit:active {
+      transform: translateY(0);
+    }
+
+    /* شريط التقدم */
+    .progress-state {
+      display: none;
+      margin-top: 12px;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .progress-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      color: #ffffff;
+    }
+
+    .progress-line {
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      width: 0%;
+      height: 100%;
+      background: #ffffff;
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+      transition: width 0.3s ease;
+    }
+
+    .progress-hint {
+      font-size: 0.72rem;
+      color: rgba(255, 255, 255, 0.7);
+      text-align: center;
+      margin-top: 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- شاشة اللودينق -->
+  <div id="loader-overlay">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- مسرح الرؤية ثلاثي الأبعاد -->
+  <div class="viewport">
+    <main id="world" class="world-canvas">
+
+      <div class="app-container">
+
+        <!-- شريط الحساب -->
+        <div class="header-bar">
+          <span class="header-user" id="userEmail">user@gmail.com</span>
+          <a href="index.html" class="header-logout">تسجيل الخروج</a>
+        </div>
+
+        <!-- النموذج -->
+        <form id="applyForm">
+
+          <div class="field-box">
+            <label>عنوان الإيميل</label>
+            <input type="text" id="subject" placeholder="مثال: طلب تقديم - المسمى الوظيفي" required>
+          </div>
+
+          <div class="field-box">
+            <label>الخطاب التعريفي</label>
+            <textarea id="coverLetter" placeholder="عناية مسؤولي التوظيف.. يسرني تزويدكم بسيرتي الذاتية للنظر فيها حال وجود شواغر مناسبة لديكم. شاكراً حسن اهتمامكم." required></textarea>
+          </div>
+
+          <div class="field-box">
+            <label>السيرة الذاتية</label>
+            <div class="file-uploader">
+              <span class="file-text" id="fileName">اختر ملف السيرة الذاتية...</span>
+              <span class="file-tag">PDF</span>
+              <input type="file" id="cvFile" accept=".pdf" required onchange="updateFileName(this)">
+            </div>
+          </div>
+
+          <div class="field-box">
+            <label>دفعة الإرسال</label>
+            <div class="batch-pills">
+              <label>
+                <input type="radio" name="batch" value="15">
+                <div class="batch-pill-btn">15 شركة</div>
+              </label>
+              <label>
+                <input type="radio" name="batch" value="30" checked>
+                <div class="batch-pill-btn">30 شركة</div>
+              </label>
+              <label>
+                <input type="radio" name="batch" value="50">
+                <div class="batch-pill-btn">50 شركة</div>
+              </label>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-submit">بدء الإرسال الآمن</button>
+        </form>
+
+        <!-- حالة الإرسال -->
+        <div class="progress-state" id="progressState">
+          <div class="progress-labels">
+            <span id="statusTxt">جاري الإرسال بفاصل عشوائي...</span>
+            <span id="countTxt" style="font-weight: 600;">0 / 30</span>
+          </div>
+          <div class="progress-line">
+            <div class="progress-fill" id="fillBar"></div>
+          </div>
+          <p class="progress-hint">
+            يتم الإرسال بوتيرة بشرية هادئة لحماية الحساب، يمكنك الخروج وسيصلك التقرير فور الانتهاء.
+          </p>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    // حركة الكاميرا الأصلية
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        const loader = document.getElementById('loader-overlay');
+        const world = document.getElementById('world');
+
+        loader.classList.add('hidden');
+        world.classList.add('look-up');
+
+        setTimeout(() => {
+          loader.remove();
+        }, 800);
+      }, 900);
+    });
+
+    // استخراج الإيميل من الرابط
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('email')) {
+      document.getElementById('userEmail').innerText = params.get('email');
+    }
+
+    // تحديث اسم الملف المرفوع
+    function updateFileName(input) {
+      if (input.files && input.files[0]) {
+        document.getElementById('fileName').innerText = input.files[0].name;
+      }
+    }
+
+    // محاكاة الإرسال
+    const form = document.getElementById('applyForm');
+    const state = document.getElementById('progressState');
+    const fill = document.getElementById('fillBar');
+    const countTxt = document.getElementById('countTxt');
+    const statusTxt = document.getElementById('statusTxt');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const total = parseInt(document.querySelector('input[name="batch"]:checked').value);
+
+      state.style.display = 'flex';
+      form.style.opacity = '0.35';
+      form.style.pointerEvents = 'none';
+
+      let count = 0;
+      countTxt.innerText = `0 / ${total}`;
+
+      const timer = setInterval(() => {
+        count++;
+        fill.style.width = `${(count / total) * 100}%`;
+        countTxt.innerText = `${count} / ${total}`;
+
+        if (count >= total) {
+          clearInterval(timer);
+          statusTxt.innerText = 'اكتمل الإرسال! تم إرسال التقرير لبريدك.';
+        }
+      }, 1000);
+    });
+  </script>
+
+</body>
+</html>
