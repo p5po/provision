@@ -1,6 +1,6 @@
-const { google } = require('googleapis');
+import { google } from 'googleapis';
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   try {
     const clientId = process.env.GOOGLE_CLIENT_ID;
     const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
@@ -34,7 +34,16 @@ module.exports = async (req, res) => {
       scope: scopes,
     });
 
-    res.writeHead(302, { Location: url });
+    return res.redirect(302, url);
+  } catch (err) {
+    console.error('Auth handler failure:', err);
+    return res.status(500).json({
+      error: 'Auth generation crashed',
+      message: err.message,
+      stack: err.stack
+    });
+  }
+}    res.writeHead(302, { Location: url });
     return res.end();
   } catch (err) {
     console.error('Google Auth Error:', err);
