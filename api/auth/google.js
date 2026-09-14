@@ -1,18 +1,27 @@
-import { google } from 'googleapis';
-
 export default async function handler(req, res) {
   try {
+    let google;
+    try {
+      const gModule = await import('googleapis');
+      google = gModule.google;
+    } catch (importErr) {
+      return res.status(500).json({
+        error: 'googleapis package is not installed',
+        details: importErr.message
+      });
+    }
+
     const clientId = process.env.GOOGLE_CLIENT_ID;
     const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
     const redirectUri = process.env.GOOGLE_REDIRECT_URI;
 
     if (!clientId || !clientSecret || !redirectUri) {
       return res.status(500).json({
-        error: 'Missing environment variables',
-        details: {
-          hasClientId: Boolean(clientId),
-          hasSecret: Boolean(clientSecret),
-          hasRedirectUri: Boolean(redirectUri)
+        error: 'Environment variables missing',
+        check: {
+          has_id: !!clientId,
+          has_secret: !!clientSecret,
+          has_redirect: !!redirectUri
         }
       });
     }
@@ -31,27 +40,14 @@ export default async function handler(req, res) {
     const url = oauth2Client.generateAuthUrl({
       access_type: 'offline',
       prompt: 'consent',
-      scope: scopes,
+      scope: scopes
     });
 
     return res.redirect(302, url);
   } catch (err) {
-    console.error('Auth handler failure:', err);
     return res.status(500).json({
-      error: 'Auth generation crashed',
-      message: err.message,
-      stack: err.stack
+      error: 'Runtime exception',
+      message: err.message
     });
-  }
-}    res.writeHead(302, { Location: url });
-    return res.end();
-  } catch (err) {
-    console.error('Google Auth Error:', err);
-    return res.status(500).json({ error: err.message });
-  }
-};    return res.redirect(302, url);
-  } catch (err) {
-    console.error('Auth error:', err);
-    return res.status(500).json({ error: err.message });
   }
 }
