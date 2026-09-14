@@ -1,11 +1,11 @@
-import { google } from 'googleapis';
+const { google } = require('googleapis');
 
-export default async function handler(req, res) {
+module.exports = async (req, res) => {
   const { code } = req.query;
 
-  // إذا المستخدم ألغى الدخول أو ما رجع كود
   if (!code) {
-    return res.redirect('/index.html?error=access_denied');
+    res.writeHead(302, { Location: '/index.html?error=access_denied' });
+    return res.end();
   }
 
   try {
@@ -15,19 +15,18 @@ export default async function handler(req, res) {
       process.env.GOOGLE_REDIRECT_URI
     );
 
-    // استبدال الكود بـ Tokens
     const { tokens } = await oauth2Client.getToken(code);
     oauth2Client.setCredentials(tokens);
 
-    // معرفة إيميل المستخدم المسجل
     const oauth2 = google.oauth2({ version: 'v2', auth: oauth2Client });
     const userInfo = await oauth2.userinfo.get();
     const userEmail = userInfo.data.email;
 
-    // توجيهه مباشرة لصفحة التقديم مع تمرير الإيميل
-    return res.redirect(`/app.html?email=${encodeURIComponent(userEmail)}`);
-  } catch (error) {
-    console.error('Callback error:', error);
-    return res.redirect('/index.html?error=auth_failed');
+    res.writeHead(302, { Location: `/app.html?email=${encodeURIComponent(userEmail)}` });
+    return res.end();
+  } catch (err) {
+    console.error('Callback error:', err);
+    res.writeHead(302, { Location: '/index.html?error=auth_failed' });
+    return res.end();
   }
-}
+};
