@@ -1,11 +1,10 @@
-const { google } = require('googleapis');
+import { google } from 'googleapis';
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   const { code } = req.query;
 
   if (!code) {
-    res.writeHead(302, { Location: '/index.html?error=access_denied' });
-    return res.end();
+    return res.redirect(302, '/index.html?error=access_denied');
   }
 
   try {
@@ -22,11 +21,14 @@ module.exports = async (req, res) => {
     const userInfo = await oauth2.userinfo.get();
     const userEmail = userInfo.data.email;
 
-    res.writeHead(302, { Location: `/app.html?email=${encodeURIComponent(userEmail)}` });
-    return res.end();
+    // حفظ التوكن مؤقتاً في الكوكيز أو تمريره للواجهة
+    // حالياً سنوجه المستخدم لصفحة app.html مع الإيميل
+    return res.redirect(302, `/app.html?email=${encodeURIComponent(userEmail)}`);
   } catch (err) {
-    console.error('Callback error:', err);
-    res.writeHead(302, { Location: '/index.html?error=auth_failed' });
-    return res.end();
+    console.error('Callback failure:', err);
+    return res.status(500).json({
+      error: 'Callback failed',
+      message: err.message
+    });
   }
-};
+}
