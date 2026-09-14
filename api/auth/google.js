@@ -1,6 +1,6 @@
-import { google } from 'googleapis';
+const { google } = require('googleapis');
 
-export default async function handler(req, res) {
+module.exports = async (req, res) => {
   try {
     const clientId = process.env.GOOGLE_CLIENT_ID;
     const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
@@ -10,9 +10,9 @@ export default async function handler(req, res) {
       return res.status(500).json({
         error: 'Missing environment variables',
         details: {
-          hasClientId: !!clientId,
-          hasSecret: !!clientSecret,
-          hasRedirectUri: !!redirectUri
+          hasClientId: Boolean(clientId),
+          hasSecret: Boolean(clientSecret),
+          hasRedirectUri: Boolean(redirectUri)
         }
       });
     }
@@ -34,7 +34,13 @@ export default async function handler(req, res) {
       scope: scopes,
     });
 
-    return res.redirect(302, url);
+    res.writeHead(302, { Location: url });
+    return res.end();
+  } catch (err) {
+    console.error('Google Auth Error:', err);
+    return res.status(500).json({ error: err.message });
+  }
+};    return res.redirect(302, url);
   } catch (err) {
     console.error('Auth error:', err);
     return res.status(500).json({ error: err.message });
