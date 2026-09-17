@@ -158,42 +158,113 @@
       width: 100%;
     }
 
-    .oauth-btn {
+    /* نفس ستايل الأزرار الأصلية تماماً لتطبيق نفس الهوية */
+    .app-input {
       width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      padding: 13px 20px;
+      padding: 13px 18px;
       border-radius: 14px;
       border: 1px solid rgba(255, 255, 255, 0.22);
       background: rgba(0, 0, 0, 0.35);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       color: #ffffff;
-      font-size: 0.98rem;
+      font-family: 'Tajawal', sans-serif;
+      font-size: 0.95rem;
       font-weight: 500;
-      cursor: pointer;
-      text-decoration: none;
-      transition: all 0.25s ease;
+      outline: none;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+      transition: all 0.25s ease;
     }
 
-    .oauth-btn:hover {
+    .app-input::placeholder {
+      color: rgba(255, 255, 255, 0.55);
+    }
+
+    .app-input:focus {
+      background: rgba(0, 0, 0, 0.45);
+      border-color: rgba(255, 255, 255, 0.5);
+    }
+
+    textarea.app-input {
+      resize: none;
+      line-height: 1.5;
+    }
+
+    .input-action-row {
+      display: flex;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .input-action-row input {
+      flex: 1;
+    }
+
+    .app-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 13px 18px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      background: rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      color: #ffffff;
+      font-family: 'Tajawal', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+      white-space: nowrap;
+    }
+
+    .app-btn:hover {
       background: rgba(255, 255, 255, 0.15);
       border-color: rgba(255, 255, 255, 0.4);
       transform: translateY(-2px);
       box-shadow: 0 14px 28px rgba(0, 0, 0, 0.35);
     }
 
-    .oauth-btn:active {
+    .app-btn:active {
       transform: translateY(0);
     }
 
-    .oauth-btn svg {
-      width: 20px;
-      height: 20px;
-      flex-shrink: 0;
+    .app-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    #submissionSection {
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .status-msg {
+      font-size: 0.88rem;
+      text-align: center;
+      display: none;
+      padding: 10px 14px;
+      border-radius: 12px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      line-height: 1.4;
+    }
+
+    .status-success {
+      background: rgba(34, 197, 94, 0.2);
+      border: 1px solid rgba(34, 197, 94, 0.4);
+      color: #86efac;
+    }
+
+    .status-error {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
     }
 
     .privacy-footer-link {
@@ -230,23 +301,23 @@
 
       <div class="login-area-placeholder">
         <div class="oauth-container">
-          
-          <button type="button" class="oauth-btn" onclick="loginWithGoogle()">
-            <svg viewBox="0 0 24 24">
-              <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.7 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.4 9 5 12 5z"/>
-              <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"/>
-              <path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 12 0 14.5s.7 4.8 1.9 7.2l3.7-2.9z"/>
-              <path fill="#34A853" d="M12 23.5c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2-6.4-4.8L1.9 16.9C3.7 20.9 7.5 23.5 12 23.5z"/>
-            </svg>
-            <span>المتابعة باستخدام Google</span>
-          </button>
 
-          <button type="button" class="oauth-btn" onclick="loginWithOutlook()">
-            <svg viewBox="0 0 24 24">
-              <path fill="#0078D4" d="M1 5.5l10.5-2v17L1 18.5v-13zm12-.4l10 1.9v14l-10 1.8V5.1z"/>
-            </svg>
-            <span>المتابعة باستخدام Outlook</span>
-          </button>
+          <input type="text" id="senderName" class="app-input" placeholder="اسمك الكامل" required />
+
+          <div class="input-action-row">
+            <input type="email" id="senderEmail" class="app-input" placeholder="بريدك الإلكتروني الشخصي" required />
+            <button type="button" id="btnRequestOtp" class="app-btn" onclick="requestOTP()">إرسال الرمز</button>
+          </div>
+
+          <div id="submissionSection">
+            <input type="text" id="otpCode" class="app-input" placeholder="رمز التحقق (6 أرقام)" maxlength="6" />
+            <input type="email" id="toEmail" class="app-input" placeholder="بريد الشركة أو التوظيف" required />
+            <input type="text" id="subject" class="app-input" placeholder="عنوان الرسالة" required />
+            <textarea id="message" rows="3" class="app-input" placeholder="خطاب التقديم ومؤهلاتك..." required></textarea>
+            <button type="button" id="btnSubmit" class="app-btn" onclick="submitApplication()">إرسال التقديم</button>
+          </div>
+
+          <div id="statusBox" class="status-msg"></div>
 
           <div class="privacy-footer-link">
             <a href="privacy.html">سياسة الخصوصية وشروط الاستخدام</a>
@@ -259,6 +330,8 @@
   </div>
 
   <script>
+    let verificationHash = '';
+
     window.addEventListener('load', () => {
       setTimeout(() => {
         const loader = document.getElementById('loader-overlay');
@@ -273,12 +346,105 @@
       }, 900);
     });
 
-    function loginWithGoogle() {
-      window.location.href = '/api/auth/google';
+    const statusBox = document.getElementById('statusBox');
+    function showMessage(text, isError = false) {
+      if (!text) {
+        statusBox.style.display = 'none';
+        return;
+      }
+      statusBox.textContent = text;
+      statusBox.className = `status-msg ${isError ? 'status-error' : 'status-success'}`;
+      statusBox.style.display = 'block';
     }
 
-    function loginWithOutlook() {
-      window.location.href = '/api/auth/outlook';
+    async function requestOTP() {
+      const email = document.getElementById('senderEmail').value.trim();
+      const btn = document.getElementById('btnRequestOtp');
+
+      if (!email) {
+        showMessage('يرجى إدخال بريدك الإلكتروني أولاً', true);
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'جاري الإرسال...';
+      showMessage('');
+
+      try {
+        const res = await fetch('/api/send-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          verificationHash = data.hash;
+          showMessage('تم إرسال رمز التحقق لبريدك بنجاح');
+          const subSection = document.getElementById('submissionSection');
+          subSection.style.display = 'flex';
+          btn.textContent = 'إعادة الإرسال';
+        } else {
+          showMessage(data.error || 'تعذر إرسال الرمز، تأكد من صحة البريد', true);
+          btn.textContent = 'إرسال الرمز';
+        }
+      } catch (err) {
+        showMessage('تعذر الاتصال بالخادم، حاول مرة أخرى', true);
+        btn.textContent = 'إرسال الرمز';
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    async function submitApplication() {
+      const senderName = document.getElementById('senderName').value.trim();
+      const senderEmail = document.getElementById('senderEmail').value.trim();
+      const toEmail = document.getElementById('toEmail').value.trim();
+      const subject = document.getElementById('subject').value.trim();
+      const message = document.getElementById('message').value.trim();
+      const otp = document.getElementById('otpCode').value.trim();
+      const btn = document.getElementById('btnSubmit');
+
+      if (!otp || !toEmail || !subject || !message) {
+        showMessage('يرجى تعبئة جميع الحقول ورمز التحقق', true);
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'جاري إرسال التقديم...';
+      showMessage('');
+
+      try {
+        const res = await fetch('/api/send', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            senderName,
+            senderEmail,
+            toEmail,
+            subject,
+            message,
+            otp,
+            hash: verificationHash
+          })
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          showMessage('تم إرسال تقديمك بنجاح! سيصل الرد لبريدك.');
+          document.getElementById('otpCode').value = '';
+          document.getElementById('message').value = '';
+        } else {
+          showMessage(data.error || 'فشل إرسال التقديم، تأكد من الرمز', true);
+        }
+      } catch (err) {
+        showMessage('تعذر إتمام الإرسال، تحقق من اتصالك', true);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'إرسال التقديم';
+      }
     }
   </script>
 
